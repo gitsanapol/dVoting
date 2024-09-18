@@ -11,9 +11,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1 className={styles.title}>
-          Welcome to <Link href="https://nextjs.org">Next.js!</Link>
-        </h1>
+
         <h1>
           <Link href="/voting">Click here to voting</Link>
         </h1>
