@@ -9,7 +9,10 @@ export default function Home() {
 
   return (
     <main>
-      <Navbar session={session} /> {/* Pass the session to Navbar */}
+      <Navbar session={session} />
+      <div className="container mx-auto text-center">
+        <h1 className='text-3xl my-5'>Homepage for dVoting system</h1>
+      </div>
     </main>
   );
 }
