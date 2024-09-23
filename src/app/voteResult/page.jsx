@@ -29,7 +29,7 @@ export default function page() {
     <div>
         <Navbar session={session} />
         <div className='container mx-auto'>
-            <h3 className='text-3xl my-3'>Vote Page</h3>
+            <h3 className='text-3xl my-3'>Vote Result</h3>
             <hr className='my-3'/>
             <div className='text-center text-xl my-5'>
               <p>studentID: {session?.user?.studentID}</p>
