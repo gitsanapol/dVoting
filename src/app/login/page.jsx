@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,7 @@ function login() {
   const router = useRouter();
 
   const {data: session} = useSession();
-  if(session) router.replace("/welcome")
+  if(session) router.replace("/votePage")
 
   const handleSubmit = async (e) =>{
     e.preventDefault();
@@ -31,7 +31,7 @@ function login() {
         return;
       }
 
-      router.replace("welcome")
+      router.replace("votePage")
 
     }catch(error){
       console.log(error)

@@ -16,11 +16,14 @@ function navbar({session}) {
                 <ul className='flex'>
                     {!session ?(
                         <>
-                        <li className='mx-3'><Link href="./login">Sign In</Link></li>
-                        <li className='mx-3'><Link href="./register">Register</Link></li>
+                        <li className='mx-3'><Link href="./login">login</Link></li>
                         </>
                     ) : (
+                        <>
+                        <li className='mx-3'><Link href="./votePage">votePage</Link></li>
+                        <li className='mx-3'><Link href="./voteResult">voteResult</Link></li>
                         <li className='mx-3'><a onClick={() => signOut()} className='bg-red-500 text-white border py-2 px-3 rounded-md text-lg my-2'>Logout</a></li>
+                        </>
                     )}
                 </ul>
             </div>
