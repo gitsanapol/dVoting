@@ -24,7 +24,7 @@ const authOptions = {
                 
                 // const user = await User.findOne({email});
                 const [rows] = await promisePool.query(
-                  `SELECT * FROM student WHERE email = ?`, 
+                  `SELECT * FROM studentInfo WHERE email = ?`, 
                   [email]
                 );
                 // Extract the user object from the rows
@@ -51,15 +51,15 @@ const authOptions = {
       callbacks: {
         async session({ session, token }) {
           // Attach studentID from token to session user
-          if (token?.studentID) {
-            session.user.studentID = token.studentID;
+          if (token?.studentId) {
+            session.user.studentId = token.studentId;
           }
           return session;
         },
         async jwt({ token, user }) {
           // First login, user object will be available
           if (user) {
-            token.studentID = user.studentID;
+            token.studentId = user.studentId;
           }
           return token;
         }
