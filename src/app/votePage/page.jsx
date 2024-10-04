@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 export default function VotePage() {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [candidates, setCandidates] = useState([]);
+  const [hasVoted, setHasVoted] = useState(false); // State to track if user has already voted
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -32,6 +33,23 @@ export default function VotePage() {
     fetchCandidates();
   }, []);
 
+  useEffect(() => {
+    // Check if the user has already voted
+    const checkIfVoted = async () => {
+      if (session?.user?.studentId) {
+        try {
+          const response = await fetch(`/api/hasVoted?studentId=${session.user.studentId}`);
+          const data = await response.json();
+          setHasVoted(data.hasVoted);
+        } catch (error) {
+          console.error("Failed to check voting status:", error);
+        }
+      }
+    };
+
+    checkIfVoted();
+  }, [session]);
+
   if (!session) {
     return <p>Loading...</p>;
   }
@@ -39,7 +57,6 @@ export default function VotePage() {
   const handleCandidateChange = (event) => {
     setSelectedCandidate(parseInt(event.target.value)); // Convert to number
   };
-  
 
   const handleVote = async () => {
     if (selectedCandidate !== null) {
@@ -49,13 +66,15 @@ export default function VotePage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             candidateId: selectedCandidate,
-            studentId: session?.user?.studentId // Pass the voter's student ID to the backend
+            studentId: session?.user?.studentId, // Pass the voter's student ID to the backend
           }),
         });
         const data = await response.json();
         if (response.ok) {
           alert(`Vote recorded for candidate ID: ${selectedCandidate}`);
+          setHasVoted(true); // Update the state to reflect that the user has voted
         } else {
+          alert(`Error: ${data.error}`);
           console.error("Error:", data.error);
         }
       } catch (error) {
@@ -102,6 +121,7 @@ export default function VotePage() {
                     value={parseInt(candidate.studentId)} // Ensure it's a number
                     checked={selectedCandidate === parseInt(candidate.studentId)} // Ensure consistent comparison
                     onChange={handleCandidateChange}
+                    disabled={hasVoted} // Disable input if the user has already voted
                   />
                 </td>
                 <td className='border border-gray-300 p-2'>{candidate.studentId}</td>
@@ -109,7 +129,6 @@ export default function VotePage() {
               </tr>
             ))}
           </tbody>
-
         </table>
 
         {/* Button to submit the vote */}
@@ -117,10 +136,13 @@ export default function VotePage() {
           <button
             onClick={handleVote}
             className='bg-blue-500 text-white p-2 rounded-md'
-            disabled={!selectedCandidate}
+            disabled={!selectedCandidate || hasVoted} // Disable button if no candidate is selected or if the user has already voted
           >
             Submit Vote
           </button>
+          {hasVoted && (
+            <p className='text-red-500 mt-3'>You have already voted and cannot vote again.</p>
+          )}
         </div>
       </div>
     </div>
