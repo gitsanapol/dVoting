@@ -1,9 +1,19 @@
-"use client";
+"use client"
 
 import { useState, useEffect } from "react";
 import Navbar from '../components/Navbar';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+
+// Utility function to hash student ID
+async function hashStudentId(studentId) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(studentId);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 export default function VoteResultPage() {
   const [candidates, setCandidates] = useState([]);
@@ -59,7 +69,16 @@ export default function VoteResultPage() {
     try {
       const response = await fetch("/api/getVoteLog");
       const data = await response.json();
-      setVoteLog(data);
+
+      // Hash the student IDs in the vote log
+      const hashedVoteLog = await Promise.all(
+        data.map(async (vote) => ({
+          candidateId: vote.candidateId,
+          studentId: await hashStudentId(vote.studentId),
+        }))
+      );
+
+      setVoteLog(hashedVoteLog);
     } catch (error) {
       console.error("Failed to fetch vote log:", error);
     }
@@ -127,7 +146,7 @@ export default function VoteResultPage() {
             <table className='min-w-full border border-gray-300 mt-5 mx-auto'>
               <thead>
                 <tr>
-                  <th className='border border-gray-300 p-2'>Student ID</th>
+                  <th className='border border-gray-300 p-2'>Hashed Student ID</th>
                   <th className='border border-gray-300 p-2'>Voted Candidate ID</th>
                 </tr>
               </thead>
