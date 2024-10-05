@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 export default function VoteResultPage() {
   const [candidates, setCandidates] = useState([]);
   const [votes, setVotes] = useState({});
+  const [voteLog, setVoteLog] = useState([]);
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -53,6 +54,17 @@ export default function VoteResultPage() {
     }
   }, [candidates]);
 
+  // Function to fetch the vote log from the blockchain
+  const handleFetchVoteLog = async () => {
+    try {
+      const response = await fetch("/api/getVoteLog");
+      const data = await response.json();
+      setVoteLog(data);
+    } catch (error) {
+      console.error("Failed to fetch vote log:", error);
+    }
+  };
+
   if (!session) {
     return <p>Loading...</p>;
   }
@@ -97,6 +109,39 @@ export default function VoteResultPage() {
             ))}
           </tbody>
         </table>
+
+        {/* Button to fetch and display vote log */}
+        <div className='text-center my-5'>
+          <button
+            onClick={handleFetchVoteLog}
+            className='bg-blue-500 text-white p-2 rounded-md'
+          >
+            Show Vote Log
+          </button>
+        </div>
+
+        {/* Display vote log */}
+        {voteLog.length > 0 && (
+          <div className='mt-5'>
+            <h4 className='text-2xl my-3'>Vote Log</h4>
+            <table className='min-w-full border border-gray-300 mt-5 mx-auto'>
+              <thead>
+                <tr>
+                  <th className='border border-gray-300 p-2'>Student ID</th>
+                  <th className='border border-gray-300 p-2'>Voted Candidate ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {voteLog.map((vote, index) => (
+                  <tr key={index}>
+                    <td className='border border-gray-300 p-2'>{vote.studentId}</td>
+                    <td className='border border-gray-300 p-2'>{vote.candidateId}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
